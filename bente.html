@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woontevredenheid</title>
+</head>
+<body>
+
+    <h1>Hallo iedereen! Welkom op de pagina over woontevredenheid</h1>
+
+    <!-- Container waar de tabel komt -->
+    <div id="tableContainer"></div>
+
+    <script>
+        // Functie die een HTML-tabel maakt uit JSON-data
+        function renderTable(data) {
+            const tableContainer = document.getElementById("tableContainer");
+
+            const columns = Object.keys(data[0]);
+            let table = "<table border='1' cellpadding='8'><tr>";
+
+            // Kolomkoppen
+            columns.forEach(col => {
+                table += `<th>${col}</th>`;
+            });
+            table += "</tr>";
+
+            // Rijen
+            data.forEach(row => {
+                table += "<tr>";
+                columns.forEach(col => {
+                    table += `<td>${row[col]}</td>`;
+                });
+                table += "</tr>";
+            });
+
+            table += "</table>";
+            tableContainer.innerHTML = table;
+        }
+
+        // Data ophalen en tabel tonen
+        fetch('http://127.0.0.1:5000/bente')
+            .then(response => response.json())
+            .then(data => {
+                renderTable(data);
+            })
+            .catch(err => {
+                console.error("❌ Fout bij ophalen van data:", err);
+            });
+    </script>
+
+</body>
+</html>
