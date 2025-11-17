@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Woontevredenheid</title>
+
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            margin: 24px;
+            background-color: lightblue;
+        }
+
+        h1, h3 {
+            color: #333;
+        }
+
+        #filters {
+        margin-bottom: 12px;
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        flex-wrap: wrap;
+        }
+
+        select {
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        /*kolomkoppen*/        
+        th {
+            text-align: left;
+            padding: 8px;
+            background: #d9eaf7; /* Lichtblauwe achtergrond voor kolomkoppen */
+            border-bottom: 1px solid #aaa;
+        }
+
+        /*tabellen cellen*/
+        td {
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+        }
+
+        /*hoveren*/
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        /*paragraaf styling*/
+        p {
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Welkom op de pagina over woontevredenheid</h1>
+
+    <h3>Statement: In 2002 is de woontevredenheid hoger dan in 2024.</h3>
+
+    <!-- Filters -->
+    <div id="filters">
+        <label for="jaarFilter">Filter op periode:</label>
+        <select id="jaarFilter">
+            <option value="all">Alle perioden</option>
+        </select>
+
+        <label for="eigenaarFilter">Filter op eigenaar/huurder:</label>
+        <select id="eigenaarFilter">
+            <option value="all">Alle typen</option>
+        </select>
+    </div>
+
+    <!-- Container waar de tabel komt -->
+    <div id="tableContainer"></div>
+
+    <p>We zien uit de tabel dat de tevredenheid met de huidige woning in 2002 89.2% is. En de tevredenheid met de huidige woning in 2024 is 82.5%. Dit betekent dat de (totale) woontevredenheid in 2002 hoger is dan de woontevredenheid in 2024.</p>
+
+    <script>
+        let globalData = [];
+
+        // Functie die een HTML-tabel maakt uit JSON-data
+        function renderTable(data) {
+            const tableContainer = document.getElementById("tableContainer");
+
+            if (!data || data.length === 0) {
+                tableContainer.innerHTML = '<p>Geen data gevonden.</p>';
+                return;
+            }
+
+            const columns = Object.keys(data[0]);
+            let table = "<table border='1' cellpadding='8'><tr>";
+            columns.forEach(col => {
+                table += `<th>${col}</th>`;
+            });
+            table += "</tr>";
+
+            data.forEach(row => {
+                table += "<tr>";
+                columns.forEach(col => {
+                    table += `<td>${row[col]}</td>`;
+                });
+                table += "</tr>";
+            });
+
+            table += "</table>";
+            tableContainer.innerHTML = table;
+        }
+
+        // Data ophalen
+        fetch('http://127.0.0.1:5000/bente')
+            .then(response => response.json())
+            .then(data => {
+                globalData = data;
+
+                // Dropdown periode vullen
+                const jaarSelect = document.getElementById('jaarFilter');
+                const perioden = Array.from(new Set(data.map(item => item.Perioden))).sort((a,b) => a-b);
+                perioden.forEach(p => {
+                    const option = document.createElement('option');
+                    option.value = p;
+                    option.textContent = p;
+                    jaarSelect.appendChild(option);
+                });
+
+                // Dropdown eigenaar/huurder vullen
+                const eigenaarSelect = document.getElementById('eigenaarFilter');
+                const eigenaren = Array.from(new Set(data.map(item => item.Eigenaar_of_huurder))).sort();
+                eigenaren.forEach(e => {
+                    const option = document.createElement('option');
+                    option.value = e;
+                    option.textContent = e;
+                    eigenaarSelect.appendChild(option);    
+                });
+
+                // Tabel renderen
+                renderTable(data);
+            })
+            .catch(err => {
+                console.error("❌ Fout bij ophalen van data:", err);
+            });
+
+        // Filterfunctie
+        function applyFilter() {
+            const gekozenPeriode = document.getElementById('jaarFilter').value;
+            const gekozenEigenaar = document.getElementById('eigenaarFilter').value;
+
+            let filtered = globalData;
+
+            if (gekozenPeriode !== "all") {
+                filtered = filtered.filter(item => String(item.Perioden) === String(gekozenPeriode));
+            }
+
+            if (gekozenEigenaar !== "all") {
+                filtered = filtered.filter(item => item.Eigenaar_of_huurder === gekozenEigenaar);
+            }
+
+            renderTable(filtered);
+        }
+
+        // Event listeners voor interactieve filters
+        document.getElementById('jaarFilter').addEventListener('change', applyFilter);
+        document.getElementById('eigenaarFilter').addEventListener('change', applyFilter);
+
+    </script>
+
+</body>
+</html>

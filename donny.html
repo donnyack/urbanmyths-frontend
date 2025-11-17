@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8" />
+    <title>Urban Myths – Inkomen per Regio</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <!-- Google Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --bg: #0f172a;
+            --bg-elevated: #020617;
+            --card: #020617;
+            --card-alt: #020818;
+            --accent: #22c55e;
+            --accent-soft: rgba(34, 197, 94, 0.1);
+            --accent-strong: #22c55e;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border-subtle: rgba(148, 163, 184, 0.25);
+            --error: #f97373;
+            --transition-fast: 150ms ease-out;
+            --radius-lg: 18px;
+            --radius-pill: 999px;
+            --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+            --shadow-subtle: 0 10px 30px rgba(15, 23, 42, 0.6);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1f2937 0, #020617 40%, #000 100%);
+            color: var(--text-main);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page {
+            max-width: 1120px;
+            margin: 0 auto;
+            padding: 32px 16px 48px;
+        }
+
+        header {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 32px;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 4px 12px;
+            border-radius: var(--radius-pill);
+            background: rgba(15, 23, 42, 0.8);
+            color: var(--accent);
+            border: 1px solid rgba(34, 197, 94, 0.25);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            font-weight: 500;
+            width: fit-content;
+        }
+
+        .badge-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 999px;
+            background: var(--accent);
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.6);
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(26px, 3vw, 32px);
+            font-weight: 600;
+            letter-spacing: -0.03em;
+        }
+
+        .subtitle {
+            max-width: 620px;
+            font-size: 14px;
+            color: var(--text-muted);
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+            gap: 24px;
+        }
+
+        @media (max-width: 880px) {
+            .layout-grid {
+                grid-template-columns: minmax(0, 1fr);
+            }
+        }
+
+        .card {
+            background: linear-gradient(145deg, rgba(15,23,42,0.95), rgba(15,23,42,0.99));
+            border-radius: var(--radius-lg);
+            border: 1px solid rgba(148, 163, 184, 0.28);
+            box-shadow: var(--shadow-soft);
+            padding: 18px 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.14), transparent 55%);
+            opacity: 0.9;
+            pointer-events: none;
+        }
+
+        .card-inner {
+            position: relative;
+            z-index: 1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 10px;
+            gap: 12px;
+        }
+
+        .card-title {
+            font-size: 15px;
+            font-weight: 500;
+            letter-spacing: 0.03em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .card-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .pill span {
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .table-wrapper {
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid rgba(148, 163, 184, 0.38);
+            background: rgba(15, 23, 42, 0.85);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            background: rgba(15, 23, 42, 0.95);
+        }
+
+        th,
+        td {
+            padding: 9px 12px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            border-bottom: 1px solid rgba(148, 163, 184, 0.4);
+        }
+
+        tbody tr {
+            border-bottom: 1px solid rgba(30, 41, 59, 0.9);
+            transition: background var(--transition-fast), transform var(--transition-fast), box-shadow var(--transition-fast);
+        }
+
+        tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        tbody tr:nth-child(even) {
+            background: radial-gradient(circle at left, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.85));
+        }
+
+        tbody tr:nth-child(odd) {
+            background: radial-gradient(circle at right, rgba(15, 23, 42, 0.9), rgba(15, 23, 42, 0.88));
+        }
+
+        .row-clickable {
+            cursor: pointer;
+        }
+
+        .row-clickable:hover {
+            background: radial-gradient(circle at center, rgba(34, 197, 94, 0.18), rgba(15, 23, 42, 0.95));
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-subtle);
+        }
+
+        .row-selected {
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.24), rgba(15, 23, 42, 0.98)) !important;
+        }
+
+        .cell-label {
+            font-weight: 500;
+        }
+
+        .cell-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 9px;
+            border-radius: var(--radius-pill);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            font-size: 11px;
+        }
+
+        .tag-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--accent);
+        }
+
+        .number,
+        .number-strong {
+            font-feature-settings: "tnum" 1, "lnum" 1;
+            font-variant-numeric: tabular-nums lining-nums;
+        }
+
+        .number-strong {
+            font-weight: 500;
+        }
+
+        .table-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 4px 2px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-swatch {
+            width: 10px;
+            height: 10px;
+            border-radius: 3px;
+            background: var(--accent-soft);
+            border: 1px solid rgba(34, 197, 94, 0.5);
+        }
+
+        .legend-swatch-alt {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(148, 163, 184, 0.6);
+        }
+
+        .status-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 3px 8px;
+            border-radius: var(--radius-pill);
+            background: rgba(15, 23, 42, 0.9);
+            border: 1px solid rgba(148, 163, 184, 0.4);
+        }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 999px;
+            background: var(--accent);
+            animation: pulse 1.6s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.3); opacity: 0.4; }
+        }
+
+        .status-chip.error .status-dot {
+            background: var(--error);
+        }
+
+        .status-chip.error {
+            border-color: rgba(248, 113, 113, 0.7);
+            color: var(--error);
+        }
+
+        .status-chip span {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .status-chip strong {
+            font-weight: 500;
+            color: var(--accent);
+        }
+
+        .status-chip.error strong {
+            color: var(--error);
+        }
+
+        .muted {
+            color: var(--text-muted);
+        }
+
+        .details-heading {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        .details-title {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: var(--radius-pill);
+            background: rgba(34, 197, 94, 0.16);
+            border: 1px solid rgba(34, 197, 94, 0.65);
+            font-size: 11px;
+            color: var(--accent-strong);
+        }
+
+        .chip-alt {
+            background: rgba(15, 23, 42, 0.9);
+            border-color: rgba(148, 163, 184, 0.6);
+            color: var(--text-muted);
+        }
+
+        .chip-label {
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .empty-state {
+            padding: 20px 16px;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 13px;
+        }
+
+        .empty-state span {
+            display: block;
+            margin-top: 6px;
+        }
+
+        .pill-mini {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 2px 8px;
+            border-radius: var(--radius-pill);
+            border: 1px dashed rgba(148, 163, 184, 0.6);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .pill-mini strong {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .mt-4 { margin-top: 16px; }
+        .mt-2 { margin-top: 8px; }
+    </style>
+</head>
+<body>
+<div class="page">
+    <header>
+        <div class="badge">
+            <span class="badge-dot"></span>
+            Urban Myths
+        </div>
+        <h1>Inkomensverschillen Randstad &amp; rest van Nederland</h1>
+        <p class="subtitle">
+            <b>Myth: “Mensen in de Randstad verdienen meer dan mensen buiten de Randstad.”</b><br><br>
+            Vergelijk het gemiddelde en mediane persoonlijke inkomen in de Randstad versus niet-Randstad
+            en zoom daarna in op de onderliggende regio’s/gemeenten met één klik.
+        </p>
+    </header>
+
+    <main class="layout-grid">
+        <!-- LINKERKAART: Randstad vs Niet-Randstad -->
+        <section class="card">
+            <div class="card-inner">
+                <div class="card-header">
+                    <div>
+                        <div class="card-title">Overzicht (Randstad vs niet-Randstad)</div>
+                        <div class="card-subtitle">
+                            Klik op een rij om de bijbehorende gemeenten/regio’s te bekijken.
+                        </div>
+                    </div>
+                    <div class="pill">
+                        Scope: <span>Persoonlijk inkomen</span>
+                    </div>
+                </div>
+
+                <div class="table-wrapper" id="overview-table-wrapper">
+                    <table aria-label="Inkomen Randstad versus niet-Randstad">
+                        <thead>
+                        <tr>
+                            <th>(Niet-)Randstad</th>
+                            <th>Gemiddeld</th>
+                            <th>Mediaan</th>
+                        </tr>
+                        </thead>
+                        <tbody id="data-table-body">
+                        <!-- Dynamisch gevuld -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="table-footer">
+                    <div class="legend">
+                        <div class="legend-item">
+                            <span class="legend-swatch"></span>
+                            <span>Actieve selectie</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-swatch legend-swatch-alt"></span>
+                            <span>Overzicht per gebied</span>
+                        </div>
+                    </div>
+                    <div id="overview-status" class="status-chip">
+                        <span class="status-dot"></span>
+                        <span><strong>Laden…</strong> data van server</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RECHTERKAART: Detail (gemeenten / regio’s) -->
+        <section class="card">
+            <div class="card-inner">
+                <div class="details-heading">
+                    <div>
+                        <div class="chip-label">Detailweergave</div>
+                        <div id="details-title" class="details-title">
+                            Nog geen selectie
+                        </div>
+                    </div>
+                    <div id="details-chip" class="chip-alt chip">
+                        <span>Geen gebied geselecteerd</span>
+                    </div>
+                </div>
+
+                <div class="table-wrapper" id="details-table-wrapper">
+                    <table aria-label="Inkomen per regio/gemeente">
+                        <thead>
+                        <tr>
+                            <th>Regio / Gemeente</th>
+                            <th>Gemiddeld</th>
+                            <th>Mediaan</th>
+                        </tr>
+                        </thead>
+                        <tbody id="details-table-body">
+                        <!-- Dynamisch gevuld -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="details-empty" class="empty-state">
+                    <span class="chip-label">Tip</span>
+                    <span>Selecteer eerst <strong>Randstad</strong> of <strong>Niet-Randstad</strong> in de linkertabel om de onderliggende gemeenten te bekijken.</span>
+                    <span class="mt-2 pill-mini">
+                        <strong>UX</strong> Klik op de rij – geen extra knoppen nodig.
+                    </span>
+                </div>
+
+                <div class="table-footer mt-4">
+                    <div class="legend">
+                        <div class="legend-item">
+                            <span class="legend-swatch"></span>
+                            <span>Gemeenten/regio’s binnen selectie</span>
+                        </div>
+                    </div>
+                    <div id="details-status" class="status-chip chip-alt">
+                        <span class="status-dot"></span>
+                        <span><strong>Wachtend</strong> op selectie</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:5000";
+
+    const overviewTbody = document.getElementById("data-table-body");
+    const detailsTbody = document.getElementById("details-table-body");
+    const detailsTitle = document.getElementById("details-title");
+    const detailsChip = document.getElementById("details-chip");
+    const detailsEmpty = document.getElementById("details-empty");
+    const overviewStatus = document.getElementById("overview-status");
+    const detailsStatus = document.getElementById("details-status");
+
+    let currentSelection = null;
+
+    function formatEuro(value) {
+        if (value === null || value === undefined || isNaN(value)) return "–";
+        const n = Number(value);
+        return "€ " + n.toLocaleString("nl-NL", {
+            minimumFractionDigits: 1,
+            maximumFractionDigits: 1
+        }) + "k";
+    }
+
+    function setOverviewStatus({ loading = false, error = null } = {}) {
+        overviewStatus.classList.remove("error");
+        const dot = overviewStatus.querySelector(".status-dot");
+        const span = overviewStatus.querySelector("span:last-child");
+
+        if (loading) {
+            overviewStatus.style.display = "inline-flex";
+            span.innerHTML = "<strong>Laden…</strong> data van server";
+            dot.style.background = "var(--accent)";
+            return;
+        }
+
+        if (error) {
+            overviewStatus.style.display = "inline-flex";
+            overviewStatus.classList.add("error");
+            dot.style.background = "var(--error)";
+            span.innerHTML = "<strong>Fout</strong> bij ophalen overzicht";
+            return;
+        }
+
+        /* Succes: statuschip verbergen, geen 'live overzicht geladen'-tekst meer */
+        overviewStatus.style.display = "none";
+    }
+
+    function setDetailsStatus({ waiting = false, loading = false, error = null } = {}) {
+        detailsStatus.classList.remove("error");
+        const dot = detailsStatus.querySelector(".status-dot");
+        const span = detailsStatus.querySelector("span:last-child");
+
+        if (waiting) {
+            span.innerHTML = "<strong>Wachtend</strong> op selectie";
+            dot.style.background = "var(--accent)";
+            return;
+        }
+
+        if (loading) {
+            span.innerHTML = "<strong>Laden…</strong> details";
+            dot.style.background = "var(--accent)";
+            return;
+        }
+
+        if (error) {
+            detailsStatus.classList.add("error");
+            dot.style.background = "var(--error)";
+            span.innerHTML = "<strong>Fout</strong> bij ophalen details";
+            return;
+        }
+
+        span.innerHTML = "<strong>Klaar</strong> details bijgewerkt";
+        dot.style.background = "var(--accent)";
+    }
+
+    function markSelectedRow(randstadValue) {
+        const rows = overviewTbody.querySelectorAll("tr");
+        rows.forEach(row => {
+            row.classList.remove("row-selected");
+            const val = Number(row.dataset.randstad);
+            if (val === randstadValue) {
+                row.classList.add("row-selected");
+            }
+        });
+    }
+
+    function loadDetails(randstadFlag) {
+        currentSelection = randstadFlag;
+        markSelectedRow(randstadFlag);
+        setDetailsStatus({ loading: true });
+        detailsEmpty.style.display = "none";
+        detailsTbody.innerHTML = "";
+
+        const isRandstad = randstadFlag === 1;
+
+        detailsTitle.textContent = isRandstad
+            ? "Gemeenten en regio’s binnen de Randstad"
+            : "Gemeenten en regio’s buiten de Randstad";
+
+        detailsChip.classList.remove("chip-alt");
+        detailsChip.innerHTML = `
+            <span class="tag-dot"></span>
+            <span>${isRandstad ? "Randstad geselecteerd" : "Niet-Randstad geselecteerd"}</span>
+        `;
+
+        fetch(`${API_BASE}/donny/details?randstad=${randstadFlag}`)
+            .then(r => {
+                if (!r.ok) throw new Error("Network response was not ok");
+                return r.json();
+            })
+            .then(data => {
+                if (!Array.isArray(data) || data.length === 0) {
+                    detailsTbody.innerHTML = `
+                        <tr>
+                            <td colspan="3" class="muted" style="padding: 18px 16px; text-align:center;">
+                                Geen onderliggende gemeenten of regio’s gevonden voor deze selectie.
+                            </td>
+                        </tr>
+                    `;
+                    setDetailsStatus({});
+                    return;
+                }
+
+                const fragment = document.createDocumentFragment();
+
+                data.forEach(row => {
+                    const tr = document.createElement("tr");
+
+                    const regio = row.Regios ?? row.regios ?? row.regio ?? "-";
+                    const avg = row.avg_pers_inkomen ?? row.avg ?? row.avg_persoonlijk_inkomen;
+                    const median = row.median_pers_inkomen ?? row.median ?? row.mediaan_persoonlijk_inkomen;
+
+                    tr.innerHTML = `
+                        <td>
+                            <span class="cell-label">${regio}</span>
+                        </td>
+                        <td class="number-strong">${formatEuro(avg)}</td>
+                        <td class="number">${formatEuro(median)}</td>
+                    `;
+
+                    fragment.appendChild(tr);
+                });
+
+                detailsTbody.appendChild(fragment);
+                setDetailsStatus({});
+            })
+            .catch(err => {
+                console.error("Error loading details:", err);
+                detailsTbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="padding: 18px 16px; text-align:center; color: var(--error);">
+                            Er ging iets mis bij het laden van de detailgegevens.
+                        </td>
+                    </tr>
+                `;
+                setDetailsStatus({ error: true });
+            });
+    }
+
+    function initOverview() {
+        setOverviewStatus({ loading: true });
+
+        fetch(`${API_BASE}/donny`)
+            .then(r => {
+                if (!r.ok) throw new Error("Network response was not ok");
+                return r.json();
+            })
+            .then(data => {
+                if (!Array.isArray(data) || data.length === 0) {
+                    overviewTbody.innerHTML = `
+                        <tr>
+                            <td colspan="3" style="padding: 18px 16px; text-align:center;" class="muted">
+                                Geen gegevens beschikbaar om weer te geven.
+                            </td>
+                        </tr>
+                    `;
+                    setOverviewStatus({});
+                    return;
+                }
+
+                overviewTbody.innerHTML = "";
+                const fragment = document.createDocumentFragment();
+
+                data.forEach(row => {
+                    const tr = document.createElement("tr");
+                    tr.classList.add("row-clickable");
+
+                    const randstadValue = Number(row.Randstad ?? row.randstad ?? 0);
+                    const avg = row.avg_pers_inkomen ?? row.avg ?? row.avg_persoonlijk_inkomen;
+                    const median = row.median_pers_inkomen ?? row.median ?? row.mediaan_persoonlijk_inkomen;
+
+                    tr.dataset.randstad = randstadValue;
+
+                    const label = randstadValue === 1 ? "Randstad" : "Niet-Randstad";
+
+                    tr.innerHTML = `
+                        <td>
+                            <div class="cell-tag">
+                                <span class="tag-dot"></span>
+                                <span>${label}</span>
+                            </div>
+                        </td>
+                        <td class="number-strong">${formatEuro(avg)}</td>
+                        <td class="number">${formatEuro(median)}</td>
+                    `;
+
+                    tr.addEventListener("click", () => loadDetails(randstadValue));
+
+                    fragment.appendChild(tr);
+                });
+
+                overviewTbody.appendChild(fragment);
+                setOverviewStatus({});
+                setDetailsStatus({ waiting: true });
+            })
+            .catch(err => {
+                console.error("Error loading overview:", err);
+                overviewTbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" style="padding: 18px 16px; text-align:center; color: var(--error);">
+                            Er ging iets mis bij het laden van het overzicht.
+                        </td>
+                    </tr>
+                `;
+                setOverviewStatus({ error: true });
+            });
+    }
+
+    document.addEventListener("DOMContentLoaded", initOverview);
+</script>
+</body>
+</html>
