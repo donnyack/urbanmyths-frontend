@@ -1,0 +1,104 @@
+<h1>Myth Busters</h1>
+Mythe: ouderen zijn vaker de dupe van online criminaliteit. <br><br>
+
+Bron: <a href="https://opendata.cbs.nl/#/CBS/nl/dataset/85846NED/table?ts=1763369992147">CBS tabel</a>. <br><br>
+
+Insights:
+<table id="data-table" border="1"></table>
+<br><br>
+
+Dus, we kunnen concluderen dat, in feite, ouderen niet vaker de dupe zijn van (verschillende vormen van) online criminaliteit. 
+<br>Afhankelijk van de categorie zijn ofwel Gen-Z'ers ofwel boomers de makkelijkste slachtoffers.
+
+
+<script>
+async function loadTable() {
+    try {
+        const response = await fetch("http://127.0.0.1:5000/abel");
+        const json = await response.json();
+
+        // Clean BOM from keys
+        const cleaned = json.map(row => {
+            const out = {};
+            for (const key in row) {
+                out[key.replace(/^\uFEFF/, "")] = row[key];
+            }
+            return out;
+        });
+
+        // Remove unwanted columns (Mannen, Vrouwen)
+        const filtered = cleaned.map(row => {
+            const newRow = {};
+
+            // Keep only columns that do NOT include "mannen" or "vrouwen"
+            for (let key in row) {
+                if (
+                    !key.toLowerCase().includes("mannen") &&
+                    !key.toLowerCase().includes("vrouwen") &&
+                    !key.toLowerCase().includes("totaal personen") &&
+                    !key.toLowerCase().includes("eenheid")
+                ) {
+                    newRow[key] = row[key];
+                }
+            }
+
+            return newRow;
+        });
+
+        // Move "Onderwerp" to the front and rename it
+        const finalData = filtered.map(row => {
+            const newRow = {};
+
+            let cleanedValue = row["Onderwerp"]
+                .replace(/\|[^|]*$/i, "")   // remove last '|' and everything after it
+                .trim();
+
+            cleanedValue += " (%)";
+
+            newRow["Categorie"] = cleanedValue;
+
+            // Add remaining keys except Onderwerp
+            for (let key in row) {
+                if (key !== "Onderwerp") {
+                    newRow[key] = row[key];
+                }
+            }
+            return newRow;
+        });
+
+        const table = document.querySelector("#data-table");
+
+        // Create header list from the first row of finalData
+        const headers = Object.keys(finalData[0]);
+
+        generateTableHead(table, headers);
+        generateTable(table, finalData);
+
+    } catch (err) {
+        console.error("Error loading table:", err);
+    }
+}
+
+function generateTableHead(table, data) {
+    let thead = table.createTHead();
+    let row = thead.insertRow();
+    data.forEach(key => {
+        let th = document.createElement("th");
+        th.textContent = key;
+        row.appendChild(th);
+    });
+}
+
+function generateTable(table, data) {
+    data.forEach(element => {
+        let row = table.insertRow();
+        for (let key in element) {
+            let cell = row.insertCell();
+            cell.textContent = element[key];
+        }
+    });
+}
+
+loadTable();
+</script>
+
