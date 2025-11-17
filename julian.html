@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8" />
+    <title>Onderwijs Mythen – Julian</title>
+    <style>
+        :root {
+            --bg: #050816;
+            --card-bg: #0f172a;
+            --accent: #22c55e;
+            --accent-soft: rgba(34, 197, 94, 0.15);
+            --accent-strong: #16a34a;
+            --text-main: #e5e7eb;
+            --text-muted: #9ca3af;
+            --border-subtle: #1f2937;
+            --danger: #ef4444;
+            --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.75);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: radial-gradient(circle at top, #1e293b 0, #020617 55%);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            align-items: stretch;
+            justify-content: center;
+            padding: 32px 16px;
+        }
+
+        .app-shell {
+            width: 100%;
+            max-width: 1100px;
+            background: linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.98));
+            border-radius: 24px;
+            border: 1px solid rgba(148, 163, 184, 0.18);
+            box-shadow: var(--shadow-soft);
+            display: grid;
+            grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+            gap: 0;
+            overflow: hidden;
+        }
+
+        @media (max-width: 900px) {
+            .app-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .sidebar {
+            padding: 24px 28px 24px 26px;
+            border-right: 1px solid var(--border-subtle);
+            background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent 60%);
+        }
+
+        .content {
+            padding: 24px 28px;
+            background: radial-gradient(circle at top right, rgba(59,130,246,0.18), transparent 60%);
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: 0.03em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .badge {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            padding: 3px 9px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.5);
+            color: var(--text-muted);
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .myth-highlight {
+            margin-top: 10px;
+            border-radius: 12px;
+            padding: 10px 12px;
+            background: radial-gradient(circle at left, var(--accent-soft), transparent 70%);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            font-size: 13px;
+        }
+
+        .myth-highlight strong {
+            color: var(--accent);
+        }
+
+        .section-label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.17em;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .controls-group {
+            margin-top: 12px;
+            margin-bottom: 18px;
+        }
+
+        .field-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 900px) {
+            .field-row {
+                flex-direction: column;
+            }
+        }
+
+        .field {
+            flex: 1;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            margin-bottom: 4px;
+            color: var(--text-muted);
+        }
+
+        select {
+            width: 100%;
+            border-radius: 10px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            padding: 10px 12px;
+            font-size: 14px;
+            background: #0f172a;        /* darker background */
+            color: #f8fafc;             /* bright readable text */
+            outline: none;
+            appearance: none;
+            transition: border-color 0.15s ease, background 0.15s ease;
+        }
+
+        select:hover {
+            border-color: var(--accent);
+        }
+
+        select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.3);
+            background: #1e293b; /* slightly lighter when focused */
+        }
+
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .buttons-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        button {
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.35);
+            padding: 9px 10px;
+            font-size: 13px;
+            font-weight: 500;
+            background: radial-gradient(circle at top, #020617, #020617);
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: transform 0.12s ease, box-shadow 0.12s ease, border-color 0.12s ease, background 0.12s ease;
+        }
+
+        button span.icon {
+            font-size: 16px;
+        }
+
+        button.primary {
+            border-color: rgba(34, 197, 94, 0.8);
+            background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+            color: #022c22;
+            box-shadow: 0 8px 25px rgba(34, 197, 94, 0.45);
+        }
+
+        button.primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 10px 28px rgba(34, 197, 94, 0.55);
+        }
+
+        button:hover:not(.primary) {
+            transform: translateY(-1px);
+            border-color: rgba(148, 163, 184, 0.7);
+            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.85);
+        }
+
+        button:active {
+            transform: translateY(0);
+            box-shadow: none;
+        }
+
+        .hint {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 8px;
+            max-width: 330px;
+        }
+
+        /* Content area */
+
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .result-title {
+            font-size: 15px;
+            font-weight: 600;
+        }
+
+        .result-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .chip {
+            padding: 3px 8px;
+            border-radius: 999px;
+            border: 1px solid rgba(148, 163, 184, 0.4);
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .status {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+        }
+
+        .status span.em {
+            color: var(--accent);
+            font-weight: 500;
+        }
+
+        .table-wrapper {
+            position: relative;
+            margin-top: 8px;
+            border-radius: 14px;
+            border: 1px solid rgba(31, 41, 55, 0.85);
+            background: radial-gradient(circle at top left, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.96));
+            max-height: 420px;
+            overflow: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+        }
+
+        thead {
+            position: sticky;
+            top: 0;
+            background: linear-gradient(to right, #020617, #020617);
+            box-shadow: 0 1px 0 rgba(31, 41, 55, 0.9);
+            z-index: 1;
+        }
+
+        th, td {
+            padding: 8px 10px;
+            text-align: left;
+            white-space: nowrap;
+        }
+
+        th {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.13em;
+            color: var(--text-muted);
+        }
+
+        tbody tr:nth-child(odd) {
+            background-color: rgba(15, 23, 42, 0.9);
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: rgba(15, 23, 42, 0.8);
+        }
+
+        tbody tr.special {
+            background: linear-gradient(90deg, rgba(34, 197, 94, 0.25), rgba(15, 23, 42, 0.85));
+        }
+
+        tbody tr.special td {
+            color: #ecfdf3;
+            font-weight: 500;
+        }
+
+        tbody tr:hover {
+            background-color: rgba(30, 64, 175, 0.35);
+        }
+
+        code {
+            font-size: 11px;
+            background-color: rgba(15, 23, 42, 0.8);
+            padding: 2px 6px;
+            border-radius: 999px;
+            border: 1px solid rgba(31, 41, 55, 0.85);
+        }
+
+        .error {
+            color: var(--danger);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+
+        .empty-state {
+            margin-top: 20px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+<body>
+<div class="app-shell">
+    <!-- LEFT: Controls -->
+    <div class="sidebar">
+        <div class="badge">CBS-data · Gediplomeerden</div>
+        <div class="title">
+            Onderwijsmythe
+            <span style="font-size: 12px; color: var(--accent); background: rgba(34,197,94,0.16); padding: 2px 8px; border-radius: 999px; border: 1px solid rgba(34,197,94,0.45);">
+                Noord-Brabant vs Nederland
+            </span>
+        </div>
+        <div class="subtitle">
+            Verken gediplomeerden per provincie en onderwijssoort op basis van CBS-data.
+        </div>
+
+        <div class="myth-highlight">
+            <strong>Mythe:</strong> “Noord-Brabant heeft relatief hoger onderwijs dan de rest van het land.”<br />
+            Gebruik de knoppen rechts om de data te verkennen en de mythe te onderzoeken.
+        </div>
+
+        <div class="controls-group">
+            <div class="section-label">Interactieve acties</div>
+
+            <!-- Overview Button -->
+            <div class="field-row">
+                <button id="btnOverview" class="primary" style="flex: 1;">
+                    <span class="icon">📊</span>
+                    Overzicht per provincie
+                </button>
+            </div>
+
+            <!-- Province + Button -->
+            <div class="field-row">
+                <div class="field">
+                    <label for="provincieSelect">Provincie</label>
+                    <select id="provincieSelect">
+                        <option value="">– Kies een provincie –</option>
+                        <option>Drenthe (PV)</option>
+                        <option>Flevoland (PV)</option>
+                        <option>Friesland (PV)</option>
+                        <option>Gelderland (PV)</option>
+                        <option>Groningen (PV)</option>
+                        <option>Limburg (PV)</option>
+                        <option>Noord-Brabant (PV)</option>
+                        <option>Noord-Holland (PV)</option>
+                        <option>Overijssel (PV)</option>
+                        <option>Utrecht (PV)</option>
+                        <option>Zeeland (PV)</option>
+                        <option>Zuid-Holland (PV)</option>
+                    </select>
+                </div>
+
+                <button id="btnByProvince" style="flex: 1; margin-top: 22px;">
+                    <span class="icon">🏙️</span>
+                    Details per provincie
+                </button>
+            </div>
+
+            <!-- Education + Button -->
+            <div class="field-row">
+                <div class="field">
+                    <label for="educationSelect">Onderwijssoort</label>
+                    <select id="educationSelect">
+                        <option value="">– Kies een onderwijssoort –</option>
+                        <option>Havo</option>
+                        <option>Hbo-associate degree</option>
+                        <option>Hbo-bachelor</option>
+                        <option>Hbo-master/vervolgopleiding</option>
+                        <option>MBO Entreeopleiding (incl. extranei)</option>
+                        <option>MBO Niveau 2 (incl. extranei)</option>
+                        <option>MBO Niveau 3 (incl. extranei)</option>
+                        <option>MBO Niveau 4 (incl. extranei)</option>
+                        <option>Vavo havo</option>
+                        <option>Vavo vmbo-t</option>
+                        <option>Vavo vwo</option>
+                        <option>Vmbo g/t</option>
+                        <option>Vmbo-b</option>
+                        <option>Vmbo-k</option>
+                        <option>Vwo</option>
+                        <option>Wo-bachelor</option>
+                        <option>Wo-master</option>
+                    </select>
+                </div>
+
+                <button id="btnTopForEducation" style="flex: 1; margin-top: 22px;">
+                    <span class="icon">🎓</span>
+                    Top provincies per onderwijssoort
+                </button>
+            </div>
+
+            <!-- Myth Button -->
+            <div class="field-row">
+                <button id="btnMythHigherEdu" class="primary" style="flex: 1;">
+                    <span class="icon">🧪</span>
+                    Mythe: hoger onderwijs aandeel
+                </button>
+            </div>
+            <div id="error" class="error"> </div>
+        </div>
+    </div>
+
+    <!-- RIGHT: Results -->
+    <div class="content">
+        <div class="result-header">
+            <div>
+                <div id="resultTitle" class="result-title">Nog geen data geladen</div>
+                <div id="resultSubtitle" class="result-subtitle">
+                    Kies een actie aan de linkerkant om te beginnen.
+                </div>
+            </div>
+            <div id="resultChip" class="chip">Mode: –</div>
+        </div>
+
+        <div id="status" class="status">
+            Status: <span class="em">wachten op een query…</span>
+        </div>
+
+        <div class="table-wrapper" id="tableWrapper" style="display: none;">
+            <table id="resultTable"></table>
+        </div>
+
+        <div id="emptyState" class="empty-state">
+            Hier verschijnen de resultaten als tabel. Gebruik de knoppen om
+            JSON-resultaten van de Flask-API te laden.
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = "http://127.0.0.1:5000/julian";
+
+    const provincieSelect = document.getElementById("provincieSelect");
+    const educationSelect = document.getElementById("educationSelect");
+
+    const btnOverview = document.getElementById("btnOverview");
+    const btnByProvince = document.getElementById("btnByProvince");
+    const btnTopForEducation = document.getElementById("btnTopForEducation");
+    const btnMythHigherEdu = document.getElementById("btnMythHigherEdu");
+
+    const resultTitle = document.getElementById("resultTitle");
+    const resultSubtitle = document.getElementById("resultSubtitle");
+    const resultChip = document.getElementById("resultChip");
+    const statusEl = document.getElementById("status");
+    const errorEl = document.getElementById("error");
+    const tableWrapper = document.getElementById("tableWrapper");
+    const resultTable = document.getElementById("resultTable");
+    const emptyState = document.getElementById("emptyState");
+
+    function setStatus(text) {
+        statusEl.innerHTML = "Status: <span class=\"em\">" + text + "</span>";
+    }
+
+    function setError(msg) {
+        errorEl.textContent = msg || "";
+    }
+
+    async function callApi(params, modeLabel, title, subtitle) {
+        setError("");
+        setStatus("laden…");
+        tableWrapper.style.display = "none";
+        emptyState.style.display = "none";
+
+        const url = API_BASE + "?" + new URLSearchParams(params).toString();
+        resultChip.textContent = "Mode: " + modeLabel;
+
+        try {
+            const res = await fetch(url);
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error("HTTP " + res.status + ": " + text);
+            }
+            const data = await res.json();
+
+            resultTitle.textContent = title;
+            resultSubtitle.textContent = subtitle;
+
+            if (!data || data.length === 0) {
+                tableWrapper.style.display = "none";
+                emptyState.style.display = "block";
+                emptyState.textContent = "Geen resultaten gevonden voor deze query.";
+                setStatus("geen resultaten");
+                return;
+            }
+
+            renderTable(data, params.mode);
+            tableWrapper.style.display = "block";
+            emptyState.style.display = "none";
+            setStatus("resultaten geladen");
+        } catch (err) {
+            console.error(err);
+            setError("Er ging iets mis bij het ophalen van data. Check of de Flask-server draait.");
+            setStatus("fout bij laden");
+        }
+    }
+
+    function renderTable(data, mode) {
+        resultTable.innerHTML = "";
+
+        const keys = Object.keys(data[0]);
+
+        const thead = document.createElement("thead");
+        const headRow = document.createElement("tr");
+        keys.forEach(k => {
+            const th = document.createElement("th");
+            th.textContent = k;
+            headRow.appendChild(th);
+        });
+        thead.appendChild(headRow);
+
+        const tbody = document.createElement("tbody");
+
+        data.forEach(row => {
+            const tr = document.createElement("tr");
+
+            // Highlight Noord-Brabant (PV) for myth mode
+            if (mode === "myth_higher_edu" && row.provincie === "Noord-Brabant (PV)") {
+                tr.classList.add("special");
+            }
+
+            keys.forEach(k => {
+                const td = document.createElement("td");
+                let value = row[k];
+
+                // Nice formatting for percentages
+                if (k.toLowerCase().includes("percentage") && typeof value === "number") {
+                    value = value.toFixed(2) + " %";
+                }
+                td.textContent = value;
+                tr.appendChild(td);
+            });
+
+            tbody.appendChild(tr);
+        });
+
+        resultTable.appendChild(thead);
+        resultTable.appendChild(tbody);
+    }
+
+    // Button handlers
+    btnOverview.addEventListener("click", () => {
+        callApi(
+            { mode: "overview" },
+            "overview",
+            "Overzicht: totaal aantal gediplomeerden per provincie",
+            "Alle provincies, gesorteerd op totaal aantal gediplomeerden."
+        );
+    });
+
+    btnByProvince.addEventListener("click", () => {
+        const prov = provincieSelect.value;
+        if (!prov) {
+            setError("Kies eerst een provincie.");
+            return;
+        }
+
+        callApi(
+            { mode: "by_province", provincie: prov },
+            "by_province",
+            "Details voor provincie: " + prov,
+            "Aantal gediplomeerden per onderwijssoort voor " + prov + "."
+        );
+    });
+
+    btnTopForEducation.addEventListener("click", () => {
+        const edu = educationSelect.value;
+        if (!edu) {
+            setError("Kies eerst een onderwijssoort.");
+            return;
+        }
+
+        callApi(
+            { mode: "top_for_education", onderwijssoort: edu },
+            "top_for_education",
+            "Top provincies voor: " + edu,
+            "Provincies gesorteerd op aantal gediplomeerden voor \"" + edu + "\"."
+        );
+    });
+
+    btnMythHigherEdu.addEventListener("click", () => {
+        callApi(
+            { mode: "myth_higher_edu" },
+            "myth_higher_edu",
+            "Mythe: aandeel hoger onderwijs per provincie",
+            "Provincies gesorteerd op percentage HBO+WO. Noord-Brabant wordt gemarkeerd."
+        );
+    });
+</script>
+</body>
+</html>
