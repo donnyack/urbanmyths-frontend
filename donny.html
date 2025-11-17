@@ -1,0 +1,75 @@
+<h1>Urban Myths - Inkomen/Regio</h1>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>(Niet-)Randstad</th>
+            <th>Gemiddeld Inkomen</th>
+            <th>Mediaan Inkomen</th>
+        </tr>
+    </thead>
+    <tbody id="data-table-body"></tbody>
+</table>
+
+<h2 id="details-title">Klik op een rij om details te zien</h2>
+
+<table border="1" cellpadding="8">
+    <thead>
+        <tr>
+            <th>Regio / Gemeente</th>
+            <th>Gemiddeld Inkomen</th>
+            <th>Mediaan Inkomen</th>
+        </tr>
+    </thead>
+    <tbody id="details-table-body"></tbody>
+</table>
+
+<script>
+function loadDetails(randstadFlag) {
+    const detailsTitle = document.getElementById("details-title");
+    const detailsTbody = document.getElementById("details-table-body");
+
+    detailsTitle.textContent = randstadFlag === 1 
+        ? "Regio's in de Randstad" 
+        : "Regio's buiten de Randstad";
+
+    detailsTbody.innerHTML = "";
+
+    fetch(`http://127.0.0.1:5000/donny/details?randstad=${randstadFlag}`)
+        .then(r => r.json())
+        .then(data => {
+            data.forEach(row => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${row.Regios}</td>
+                    <td>${row.avg_pers_inkomen}</td>
+                    <td>${row.median_pers_inkomen}</td>
+                `;
+                detailsTbody.appendChild(tr);
+            });
+        });
+}
+
+fetch("http://127.0.0.1:5000/donny")
+    .then(r => r.json())
+    .then(data => {
+        let tbody = document.getElementById("data-table-body");
+
+        data.forEach(row => {
+            const tr = document.createElement("tr");
+
+            tr.innerHTML = `
+                <td>${row.Randstad === 1 ? "Randstad" : "Niet-Randstad"}</td>
+                <td>${row.avg_pers_inkomen}</td>
+                <td>${row.median_pers_inkomen}</td>
+            `;
+
+            tr.style.cursor = "pointer";
+            tr.addEventListener("click", () => {
+                loadDetails(row.Randstad);
+            });
+
+            tbody.appendChild(tr);
+        });
+    });
+</script>
